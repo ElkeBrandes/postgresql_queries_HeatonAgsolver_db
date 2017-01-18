@@ -145,6 +145,7 @@ GROUP BY ave_no3_leach_swg_round_unprofit;
 
 ALTER TABLE "05_dndc_clumu_cgsb_swg_n_loss"
 ADD COLUMN ave_n_loss_cgsb_round NUMERIC,
+ADD COLUMN ave_nh3_vol_cgsb_round NUMERIC,
 ADD COLUMN ave_n_loss_swg_7500_round NUMERIC,
 ADD COLUMN ave_n_loss_swg_10000_round NUMERIC,
 ADD COLUMN ave_n_loss_swg_12500_round NUMERIC;
@@ -152,6 +153,7 @@ ADD COLUMN ave_n_loss_swg_12500_round NUMERIC;
 UPDATE "05_dndc_clumu_cgsb_swg_n_loss"
 SET 
 ave_n_loss_cgsb_round = ROUND(ave_n_loss_ha_cgsb,0),
+ave_nh3_vol_cgsb_round = ROUND(ave_nh3_vol_ha_cgsb,0),
 ave_n_loss_swg_7500_round = ROUND(ave_n_loss_ha_swg_7500,0),
 ave_n_loss_swg_10000_round = ROUND(ave_n_loss_ha_swg_10000,0),
 ave_n_loss_swg_12500_round = ROUND(ave_n_loss_ha_swg_12500,0);
@@ -165,6 +167,14 @@ ave_n_loss_cgsb_round,
 sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg_n_loss"
 GROUP BY ave_n_loss_cgsb_round;
+
+DROP TABLE IF EXISTS "06_cgsb_ave_nh3_vol_rounded_aggr";
+CREATE TABLE "06_cgsb_ave_nh3_vol_rounded_aggr"
+AS SELECT
+ave_nh3_vol_cgsb_round,
+sum(clumuha) AS area_ha
+FROM "05_dndc_clumu_cgsb_swg_n_loss"
+GROUP BY ave_nh3_vol_cgsb_round;
 
 
 DROP TABLE IF EXISTS "06_swg_7500_ave_n_loss_rounded_aggr";
