@@ -10,7 +10,7 @@ SET cluid_mukey = cluid || mukey;
 -- calculate mean profits for each polygon in a new table
 -- calculate standard deviation as a measure of variability 
 -- convert to metric system
-/*
+
 DROP TABLE IF EXISTS "01_clumu_cgsb_profit_2012_2015_mean";
 CREATE TABLE "01_clumu_cgsb_profit_2012_2015_mean"
 AS SELECT
@@ -21,8 +21,8 @@ acres / 2.471 as clumuha,
 AVG(profit_csr2) * 2.471 AS mean_profit_ha,
 STDDEV_POP(profit_csr2 * 2.471) AS std_profit
 FROM clumu_cgsb_profit_2012_2015
-GROUP BY cluid_mukey, cluid, acres, fips_crent;
-*/
+GROUP BY cluid_mukey, cluid, acres, fips;
+
 
 -- for distribution, round profits and std deviation to the dollar and aggregate
 /*
