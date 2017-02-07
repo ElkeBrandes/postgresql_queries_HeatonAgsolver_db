@@ -10,7 +10,7 @@ SET cluid_mukey = cluid || mukey;
 -- calculate mean profits for each polygon in a new table
 -- calculate standard deviation as a measure of variability 
 -- convert to metric system
-
+/*
 DROP TABLE IF EXISTS "01_clumu_cgsb_profit_2012_2015_mean";
 CREATE TABLE "01_clumu_cgsb_profit_2012_2015_mean"
 AS SELECT
@@ -22,7 +22,7 @@ AVG(profit_csr2) * 2.471 AS mean_profit_ha,
 STDDEV_POP(profit_csr2 * 2.471) AS std_profit
 FROM clumu_cgsb_profit_2012_2015
 GROUP BY cluid_mukey, cluid, acres, fips;
-
+*/
 
 -- for distribution, round profits and std deviation to the dollar and aggregate
 /*
@@ -35,16 +35,16 @@ UPDATE "01_clumu_cgsb_profit_2012_2015_mean"
 SET 
 profit_mean_ha_rounded = ROUND(mean_profit_ha,0),
 profit_std_ha_rounded = ROUND(std_profit,0);
-
+*/
 -- aggregate to the rounded mean profit values by summing up the areas
 
-DROP TABLE IF EXISTS "01_profit_mean_2012_2015_aggregated";
-CREATE TABLE "01_profit_mean_2012_2015_aggregated"
+DROP TABLE IF EXISTS "profit_mean_2012_2015_aggregated";
+CREATE TABLE "profit_mean_2012_2015_aggregated"
 AS SELECT 
-profit_mean_ha_rounded,
-sum(clumuha) as sum_ha
+profit_mean_ha_rounded AS profit_ha_rounded,
+sum(clumuha) as area_ha
 FROM "01_clumu_cgsb_profit_2012_2015_mean"
-GROUP BY profit_mean_ha_rounded;
+GROUP BY profit_ha_rounded;
 
 -- calculate total area:
 -- SELECT SUM(sum_ha) FROM "01_profit_mean_2012_2015_aggregated" WHERE profit_mean_ha_rounded < 0;
@@ -53,78 +53,78 @@ GROUP BY profit_mean_ha_rounded;
 -- create distributions for each year 
 -- convert into metric system
 -- aggregate to profitability
-*/
+
 -- 2012:
-/*
-DROP TABLE IF EXISTS "01_profit_rounded_aggregated_2012";
-CREATE TABLE "01_profit_rounded_aggregated_2012"
+
+DROP TABLE IF EXISTS "profit_rounded_aggregated_2012";
+CREATE TABLE "profit_rounded_aggregated_2012"
 AS WITH 
 profit_rounded_2012 AS(
 SELECT
 ccrop,
 acres/2.471 as clumuha,
-ROUND(profit_csr2*2.471,0) as profit_2012_ha_rounded
+ROUND(profit_csr2*2.471,0) as profit_ha_rounded
 FROM clumu_cgsb_profit_2012_2015
 WHERE year = 2012)
  SELECT
-profit_2012_ha_rounded,
-SUM(clumuha) AS area
+profit_ha_rounded,
+SUM(clumuha) AS area_ha
 FROM profit_rounded_2012
-GROUP BY profit_2012_ha_rounded;
+GROUP BY profit_ha_rounded;
 
 -- 2013:
 
-DROP TABLE IF EXISTS "01_profit_rounded_aggregated_2013";
-CREATE TABLE "01_profit_rounded_aggregated_2013"
+DROP TABLE IF EXISTS "profit_rounded_aggregated_2013";
+CREATE TABLE "profit_rounded_aggregated_2013"
 AS WITH 
 profit_rounded_2013 AS(
 SELECT
 ccrop,
 acres/2.471 as clumuha,
-ROUND(profit_csr2*2.471,0) as profit_2013_ha_rounded
+ROUND(profit_csr2*2.471,0) as profit_ha_rounded
 FROM clumu_cgsb_profit_2012_2015
 WHERE year = 2013)
  SELECT
-profit_2013_ha_rounded,
-SUM(clumuha) AS area
+profit_ha_rounded,
+SUM(clumuha) AS area_ha
 FROM profit_rounded_2013
-GROUP BY profit_2013_ha_rounded;
+GROUP BY profit_ha_rounded;
 
 
 -- 2014:
-DROP TABLE IF EXISTS "01_profit_rounded_aggregated_2014";
-CREATE TABLE "01_profit_rounded_aggregated_2014"
+DROP TABLE IF EXISTS "profit_rounded_aggregated_2014";
+CREATE TABLE "profit_rounded_aggregated_2014"
 AS WITH 
 profit_rounded_2014 AS(
 SELECT
 ccrop,
 acres/2.471 as clumuha,
-ROUND(profit_csr2*2.471,0) as profit_2014_ha_rounded
+ROUND(profit_csr2*2.471,0) as profit_ha_rounded
 FROM clumu_cgsb_profit_2012_2015
 WHERE year = 2014)
  SELECT
-profit_2014_ha_rounded,
-SUM(clumuha) AS area
+profit_ha_rounded,
+SUM(clumuha) AS area_ha
 FROM profit_rounded_2014
-GROUP BY profit_2014_ha_rounded;
+GROUP BY profit_ha_rounded;
 
 -- 2015:
-DROP TABLE IF EXISTS "01_profit_rounded_aggregated_2015";
-CREATE TABLE "01_profit_rounded_aggregated_2015"
+DROP TABLE IF EXISTS "profit_rounded_aggregated_2015";
+CREATE TABLE "profit_rounded_aggregated_2015"
 AS WITH 
 profit_rounded_2015 AS(
 SELECT
 ccrop,
 acres/2.471 as clumuha,
-ROUND(profit_csr2*2.471,0) as profit_2015_ha_rounded
+ROUND(profit_csr2*2.471,0) as profit_ha_rounded
 FROM clumu_cgsb_profit_2012_2015
 WHERE year = 2015)
  SELECT
-profit_2015_ha_rounded,
-SUM(clumuha) AS area
+profit_ha_rounded,
+SUM(clumuha) AS area_ha
 FROM profit_rounded_2015
-GROUP BY profit_2015_ha_rounded;
-*/
+GROUP BY profit_ha_rounded;
+
 
 -- create a table with the area in corn and soybean and the area below break even profit for each county 
 /*
