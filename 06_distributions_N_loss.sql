@@ -5,19 +5,23 @@
 -- the table "05_dndc_clumu_cgsb_swg" includes clumuha and NO3 leaching for corn/bean and swg. 
 --add two columns with the rounded values 
 
-/*
+
 ALTER TABLE "05_dndc_clumu_cgsb_swg"
 ADD COLUMN ave_no3_leach_cgsb_round NUMERIC,
-ADD COLUMN ave_no3_leach_swg_7500_round NUMERIC,
-ADD COLUMN ave_no3_leach_swg_10000_round NUMERIC,
-ADD COLUMN ave_no3_leach_swg_12500_round NUMERIC;
+ADD COLUMN ave_nh3_vol_cgsb_round NUMERIC,
+ADD COLUMN ave_n_loss_cgsb_round NUMERIC,
+ADD COLUMN ave_no3_leach_swg_int_7500_round NUMERIC,
+ADD COLUMN ave_no3_leach_swg_int_10000_round NUMERIC,
+ADD COLUMN ave_no3_leach_swg_int_12500_round NUMERIC;
 
 UPDATE "05_dndc_clumu_cgsb_swg"
 SET 
 ave_no3_leach_cgsb_round = ROUND(ave_no3_leach_ha_cgsb,0),
-ave_no3_leach_swg_7500_round = ROUND(ave_no3_leach_ha_swg_7500,0),
-ave_no3_leach_swg_10000_round = ROUND(ave_no3_leach_ha_swg_10000,0),
-ave_no3_leach_swg_12500_round = ROUND(ave_no3_leach_ha_swg_12500,0);
+ave_nh3_vol_cgsb_round = ROUND(ave_nh3_vol_ha_cgsb,0),
+ave_n_loss_cgsb_round = ROUND(ave_n_loss_ha_cgsb,0),
+ave_no3_leach_swg_int_7500_round = ROUND(ave_no3_leach_swg_int_7500,0),
+ave_no3_leach_swg_int_10000_round = ROUND(ave_no3_leach_swg_int_10000,0),
+ave_no3_leach_swg_int_12500_round = ROUND(ave_no3_leach_swg_int_12500,0);
 
 -- aggregate over the same leaching values
 
@@ -31,31 +35,47 @@ sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg"
 GROUP BY ave_no3_leach_cgsb_round;
 
+DROP TABLE IF EXISTS "06_cgsb_ave_nh3_vol_rounded_aggr";
+CREATE TABLE "06_cgsb_ave_nh3_vol_rounded_aggr"
+AS SELECT
+ave_nh3_vol_cgsb_round,
+sum(clumuha) AS area_ha
+FROM "05_dndc_clumu_cgsb_swg"
+GROUP BY ave_nh3_vol_cgsb_round;
+
+DROP TABLE IF EXISTS "06_cgsb_ave_n_loss_rounded_aggr";
+CREATE TABLE "06_cgsb_ave_n_loss_rounded_aggr"
+AS SELECT
+ave_n_loss_cgsb_round,
+sum(clumuha) AS area_ha
+FROM "05_dndc_clumu_cgsb_swg"
+GROUP BY ave_n_loss_cgsb_round;
+
 
 DROP TABLE IF EXISTS "06_swg_7500_ave_no3_leach_rounded_aggr";
 CREATE TABLE "06_swg_7500_ave_no3_leach_rounded_aggr"
 AS SELECT
-ave_no3_leach_swg_7500_round,
+ave_no3_leach_swg_int_7500_round,
 sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg"
-GROUP BY ave_no3_leach_swg_7500_round;
+GROUP BY ave_no3_leach_swg_int_7500_round;
 
 DROP TABLE IF EXISTS "06_swg_10000_ave_no3_leach_rounded_aggr";
 CREATE TABLE "06_swg_10000_ave_no3_leach_rounded_aggr"
 AS SELECT
-ave_no3_leach_swg_10000_round,
+ave_no3_leach_swg_int_10000_round,
 sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg"
-GROUP BY ave_no3_leach_swg_10000_round;
+GROUP BY ave_no3_leach_swg_int_10000_round;
 
 DROP TABLE IF EXISTS "06_swg_12500_ave_no3_leach_rounded_aggr";
 CREATE TABLE "06_swg_12500_ave_no3_leach_rounded_aggr"
 AS SELECT
-ave_no3_leach_swg_12500_round,
+ave_no3_leach_swg_int_12500_round,
 sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg"
-GROUP BY ave_no3_leach_swg_12500_round;
-*/
+GROUP BY ave_no3_leach_swg_int_12500_round;
+
 -- profit optimized scenario:
 
 -- distribution of no3 leaching on CGSB fields of unprofitable areas:
@@ -142,9 +162,10 @@ GROUP BY ave_no3_leach_swg_round_unprofit;
 -- the table "05_dndc_clumu_cgsb_swg_n_loss" includes clumuha and N loss for corn/bean and swg. 
 --add four columns with the rounded values 
 
-
+/*
 ALTER TABLE "05_dndc_clumu_cgsb_swg_n_loss"
 ADD COLUMN ave_n_loss_cgsb_round NUMERIC,
+ADD COLUMN ave_no3_leach_cgsb_round NUMERIC,
 ADD COLUMN ave_nh3_vol_cgsb_round NUMERIC,
 ADD COLUMN ave_n_loss_swg_7500_round NUMERIC,
 ADD COLUMN ave_n_loss_swg_10000_round NUMERIC,
@@ -153,6 +174,7 @@ ADD COLUMN ave_n_loss_swg_12500_round NUMERIC;
 UPDATE "05_dndc_clumu_cgsb_swg_n_loss"
 SET 
 ave_n_loss_cgsb_round = ROUND(ave_n_loss_ha_cgsb,0),
+ave_no3_leach_cgsb_round = ROUND(ave_no3_leach_ha_cgsb,0),
 ave_nh3_vol_cgsb_round = ROUND(ave_nh3_vol_ha_cgsb,0),
 ave_n_loss_swg_7500_round = ROUND(ave_n_loss_ha_swg_7500,0),
 ave_n_loss_swg_10000_round = ROUND(ave_n_loss_ha_swg_10000,0),
@@ -167,6 +189,14 @@ ave_n_loss_cgsb_round,
 sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg_n_loss"
 GROUP BY ave_n_loss_cgsb_round;
+
+DROP TABLE IF EXISTS "06_cgsb_ave_no3_leach_rounded_aggr";
+CREATE TABLE "06_cgsb_ave_no3_leach_rounded_aggr"
+AS SELECT
+ave_no3_leach_cgsb_round,
+sum(clumuha) AS area_ha
+FROM "05_dndc_clumu_cgsb_swg_n_loss"
+GROUP BY ave_no3_leach_cgsb_round;
 
 DROP TABLE IF EXISTS "06_cgsb_ave_nh3_vol_rounded_aggr";
 CREATE TABLE "06_cgsb_ave_nh3_vol_rounded_aggr"
@@ -200,7 +230,7 @@ ave_n_loss_swg_12500_round,
 sum(clumuha) AS area_ha
 FROM "05_dndc_clumu_cgsb_swg_n_loss"
 GROUP BY ave_n_loss_swg_12500_round;
-
+*/
 -- profit optimized scenario:
 
 -- distribution of no3 leaching on CGSB fields of unprofitable areas:
