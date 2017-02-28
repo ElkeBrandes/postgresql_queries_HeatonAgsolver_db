@@ -92,10 +92,10 @@ select sum(clumuha) from "05_dndc_clumu_cgsb_swg_n_loss";
 -- test for area below/above cut offs:
 select sum(clumuha) from "05_dndc_clumu_cgsb_swg_n_loss" where mean_profit_ha < -150 and ave_n_loss_ha_cgsb >=60;
 -- 994142
-*/
+
 
 -- take sums for Iowa (in Mg) for the BAU and different yield scenarios:
-/*
+
 DROP TABLE IF EXISTS "05_dndc_n_loss_sums_iowa_scenarios";
 CREATE TABLE "05_dndc_n_loss_sums_iowa_scenarios"
 AS SELECT
@@ -104,13 +104,13 @@ AS SELECT
 (sum(ave_n_loss_10000 * clumuha)) / 1000  as sum_ave_n_loss_10000,
 (sum(ave_n_loss_12500 * clumuha)) / 1000  as sum_ave_n_loss_12500
 FROM "05_dndc_clumu_cgsb_swg_n_loss";
-*/
+
 -- calculate change in N loss per clumu in the medium yielding scenario, when all areas losing > 150 US$/ha and > 60 kg N / ha are 
 -- converted to switchgrass
 
 -- create new column and calculate the difference in N loss
 -- change is negative when a loss reduction occurs. 
-/*
+
 ALTER TABLE "05_dndc_clumu_cgsb_swg_n_loss"
 ADD COLUMN ave_n_loss_change_10000 NUMERIC;
 ALTER TABLE "05_dndc_clumu_cgsb_swg_n_loss"
@@ -120,6 +120,6 @@ UPDATE "05_dndc_clumu_cgsb_swg_n_loss"
 SET 
 ave_n_loss_change_10000 = ave_n_loss_10000 - ave_n_loss_ha_cgsb,
 ave_n_loss_change_perc_10000 = round(100*(ave_n_loss_10000 - ave_n_loss_ha_cgsb)/ave_n_loss_ha_cgsb,1);
-*/
 
+*/
 
