@@ -2,7 +2,7 @@
 
 -- join CSR2 values from SSURGO to clumu details from the profit table, only 
 -- taking values from one year to avoid duplicates
-/*
+
 DROP TABLE IF EXISTS "10_clumu_csr2";
 CREATE TABLE "10_clumu_csr2" AS 
 SELECT
@@ -126,7 +126,55 @@ profit_land_cost =
 ( yield * grain_price ) - ( clu_land_cost + preharv_machinery + seed_chem
 + labor + n_cost + p_cost + k_cost + ( harv_machinery * yield ) );
  
+-- add a column to the table to calculate profit per ha and round to the full dollar
 
+ALTER TABLE "10_clumu_cgsb_profit_land_values_2012_2015"
+ADD profit_land_cost_ha_round NUMERIC;
+
+update "10_clumu_cgsb_profit_land_values_2012_2015"
+set profit_land_cost_ha_round = round(profit_land_cost * 2.471,0)
+
+
+-- aggregate profits per year and full dollar amount
+--2012
+DROP TABLE IF EXISTS "profit_landcost_rounded_aggregated_2012";
+CREATE TABLE "profit_landcost_rounded_aggregated_2012"
+AS SELECT 
+profit_land_cost_ha_round AS profit_ha_rounded,
+sum(acres)/2.471 as area_ha
+FROM "10_clumu_cgsb_profit_land_values_2012_2015"
+WHERE year = 2012
+GROUP BY profit_land_cost_ha_round;
+
+--2013
+DROP TABLE IF EXISTS "profit_landcost_rounded_aggregated_2013";
+CREATE TABLE "profit_landcost_rounded_aggregated_2013"
+AS SELECT 
+profit_land_cost_ha_round AS profit_ha_rounded,
+sum(acres)/2.471 as area_ha
+FROM "10_clumu_cgsb_profit_land_values_2012_2015"
+WHERE year = 2013
+GROUP BY profit_land_cost_ha_round;
+
+--2014
+DROP TABLE IF EXISTS "profit_landcost_rounded_aggregated_2014";
+CREATE TABLE "profit_landcost_rounded_aggregated_2014"
+AS SELECT 
+profit_land_cost_ha_round AS profit_ha_rounded,
+sum(acres)/2.471 as area_ha
+FROM "10_clumu_cgsb_profit_land_values_2012_2015"
+WHERE year = 2014
+GROUP BY profit_land_cost_ha_round;
+
+--2015
+DROP TABLE IF EXISTS "profit_landcost_rounded_aggregated_2015";
+CREATE TABLE "profit_landcost_rounded_aggregated_2015"
+AS SELECT 
+profit_land_cost_ha_round AS profit_ha_rounded,
+sum(acres)/2.471 as area_ha
+FROM "10_clumu_cgsb_profit_land_values_2012_2015"
+WHERE year = 2015
+GROUP BY profit_land_cost_ha_round;
 
 -- calculate 2012-2015 profit averages and convert to metric units
 
@@ -139,7 +187,7 @@ round(avg(profit_land_cost)*2.471,2) AS profit_land_cost_ha,
 round(avg(profit_land_cost)*2.471,0) AS profit_land_costround_ha
 FROM "10_clumu_cgsb_profit_land_values_2012_2015"
 GROUP BY cluid_mukey, acres;
-*/
+
 -- agregate to the same profit value for distribution
 
 DROP TABLE IF EXISTS "10_profit_land_values_aggr_2012_2015";
