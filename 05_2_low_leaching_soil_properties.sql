@@ -1,6 +1,19 @@
 -- I have imported sand fraction and pH by horizon and component that I have queried from the SSURGO DATABASE.
 -- now I will filter and aggregate the data to get a value for each mapunit, according to its major component.
+
+-- add a column to the ssurgo data table to calculate the horizon depth until 15 cm deap
+-- this depth will be used as weight when averaging over more than one horizon
 /*
+ALTER TABLE ssurgo_ia_soil_ph_sand_frac
+ADD COLUMN hzdep_10 INT;
+
+UPDATE ssurgo_ia_soil_ph_sand_frac
+SET hzdep_10 = 
+CASE 
+WHEN hzdepb_r <=10 THEN hzdepb_r - hzdept_r 
+WHEN hzdepb_r >10 AND hzdept_r <=10 THEN 10 - hzdept_r
+ELSE  NULL END;
+
 DROP TABLE IF EXISTS "05_ssurgo_aggregated";
 CREATE TABLE "05_ssurgo_aggregated"
 AS WITH
@@ -10,10 +23,11 @@ fips,
 mukey,
 cokey,
 comppct_r,
-round(avg(sandtotal_r::NUMERIC),1) AS avg_sandtotal_r,
-round(avg(ph1to1h2o_r::NUMERIC),1) AS avg_ph1to1h2o_r,
-round(avg(ph01mcacl2_r::NUMERIC),1) AS avg_ph01mcacl2_r
+round(sum(sandtotal_r::NUMERIC * hzdep_10)/sum(hzdep_10),1) AS avg_sandtotal_r,
+round(sum(ph1to1h2o_r::NUMERIC * hzdep_10)/sum(hzdep_10),1) AS avg_ph1to1h2o_r,
+round(sum(ph01mcacl2_r::NUMERIC * hzdep_10)/sum(hzdep_10),1) AS avg_ph01mcacl2_r
 FROM ssurgo_ia_soil_ph_sand_frac
+WHERE hzdep_10 IS NOT NULL  -- filter for upper 10 cm
 GROUP BY cokey, mukey, fips, comppct_r
 ORDER BY cokey, mukey
 ),
@@ -75,7 +89,7 @@ t2.avg_Sandtotal_r,
 t2.avg_ph1to1h2o_r,
 t2.avg_ph01mcacl2_r
 FROM low_table AS t1
-LEFT JOIN "05_ssurgo_aggregated" AS t2 ON t1.mukey = t2.mukey::TEXT;
+LEFT JOIN "05_ssurgo_aggregated" AS t2 ON t1.mukey = t2.mukey;
 
 
 
